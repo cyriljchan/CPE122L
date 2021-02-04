@@ -1,0 +1,219 @@
+amp = 12*0.1; %amplitude
+%%%%%%%%%%%%%%%%%%%%
+%     Number 1     %
+%%%%%%%%%%%%%%%%%%%%
+%sinusoidal wave
+figure;
+n = 1000; %samples
+
+%plot a
+subplot(2,2,1);
+fs = 8000; %sampling frequency
+a = num1(fs, amp, n);
+plot(a(1:200));
+title('Plot 1a');
+
+%plot b
+subplot(2,2,2);
+fs = 6000; %sampling frequency
+b = num1(fs, amp, n);
+plot(b(1:200));
+title('Plot 1b');
+
+%plot c
+subplot(2,2,3);
+fs = 4050; %sampling frequency
+c = num1(fs, amp, n);
+plot(c(1:200));
+title('Plot 1c');
+
+%plot d
+subplot(2,2,4);
+fs = 3900; %sampling frequency
+d = num1(fs, amp, n);
+plot(d(1:200));
+title('Plot 1d');
+
+sgtitle('Number 1'); %subplots title
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 2     %
+%%%%%%%%%%%%%%%%%%%%
+figure;
+%Signal a + Signal c
+subplot(2,1,1);
+ac = sigadd(a, size(a), c, size(c));
+plot(ac(1:250));
+title('Plot 2a');
+
+%Signal a * Signal c
+subplot(2,1,2);
+ac = sigmult(a, size(a), c, size(c));
+plot(ac(1:250));
+title('Plot 2b');
+
+sgtitle('Number 2');
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 3     %
+%%%%%%%%%%%%%%%%%%%%
+%exponentially decaying signal
+figure;
+n = 250;
+fs = 1000; %Hz
+y = expDecay(fs, amp, n);
+plot(y);
+title('Plot 3');
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 4     %
+%%%%%%%%%%%%%%%%%%%%
+%sinusoidal wave 2
+figure;
+n = 300;
+fs = 8000; %Hz
+y = num4(fs, amp, n);
+plot(y);
+title('Plot 4a');
+
+%harmonic b
+figure;
+yb = harmonicb(y, fs, n)
+plot(yb)
+title('Plot 4b')
+
+%harmonic c
+figure;
+yc = harmonicc(yb, fs, n)
+plot(yc)
+title('Plot 4c')
+
+%harmonic d
+figure;
+yd = harmonicd(y, fs, n)
+plot(yd)
+title('Plot 4d')
+
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 5     %
+%%%%%%%%%%%%%%%%%%%%
+%3D figures
+figure;
+x = -3*pi:0.1:3*pi;
+y = -3*pi:0.1:3*pi;
+[X, Y] = meshgrid(x, y);
+A = sqrt(X.^2+Y.^2);
+A = sin(A)
+surf(X, Y, A);
+title('Plot 5a');
+
+%contour3
+figure;
+contour3(A, 30);
+title('Plot 5b');
+
+%complex functions
+z = cplxgrid(30);
+figure;
+f1 = (z.^5).^(1/8);
+title('Plot 5c (1)');
+cplxmap(z, f1);
+figure;
+f2 = atan(2*z);
+title('Plot 5c (2)');
+cplxmap(z, f2);
+
+
+%functions -> should always be defined at the end of the script
+%%%%%%%%%%%%%%%%%%%%
+%     Number 1     %
+%%%%%%%%%%%%%%%%%%%%
+
+
+
+function y = num1(fs, amp, n)
+%solves for the sinusoidal signal using the given
+	numSec = (1/fs)*[0:1000];
+    %t = linspace(0, numSec, n);
+	y = amp*sin(2*pi*50*numSec);
+end
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 2     %
+%%%%%%%%%%%%%%%%%%%%
+function [y,n] = sigadd(x1,n1,x2,n2)
+% implements y(n) = x1(n)+x2(n)
+% -----------------------------
+% [y,n] = sigadd(x1,n1,x2,n2)
+%   y = sum sequence over n, which includes n1 and n2
+%  x1 = first sequence over n1
+%  x2 = second sequence over n2 (n2 can be different from n1)
+	n = min(min(n1),min(n2)):max(max(n1),max(n2)); % duration of y(n)
+	y1 = zeros(1,length(n)); y2 = y1;              % initialization
+	y1(find((n>=min(n1))&(n<=max(n1))==1))=x1;     % x1 with duration of y
+	y2(find((n>=min(n2))&(n<=max(n2))==1))=x2;     % x2 with duration of y
+	y = y1+y2;                                     % sequence addition
+end
+
+function [y,n] = sigmult(x1,n1,x2,n2)
+% implements y(n) = x1(n)*x2(n)
+% -----------------------------
+% [y,n] = sigmult(x1,n1,x2,n2)
+%   y = product sequence over n, which includes n1 and n2
+%  x1 = first sequence over n1
+%  x2 = second sequence over n2 (n2 can be different from n1)
+	n = min(min(n1),min(n2)):max(max(n1),max(n2)); % duration of y(n)
+	y1 = zeros(1,length(n)); y2 = y1;              % initialization
+	y1(find((n>=min(n1))&(n<=max(n1))==1))=x1;     % x1 with duration of y
+	y2(find((n>=min(n2))&(n<=max(n2))==1))=x2;     % x2 with duration of y
+	y = y1 .* y2;                                     % sequence addition
+end
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 3     %
+%%%%%%%%%%%%%%%%%%%%
+function y = expDecay(fs, amp, n)
+%exponentially decaying signal
+	numSec = (1/fs)*n;
+    t = linspace(0, numSec, n);
+	y = amp*exp(-50*t);
+end
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 4     %
+%%%%%%%%%%%%%%%%%%%%
+function y = num4(fs, amp, n)
+%solves for the sinusoidal signal using the given
+	numSec = (1/fs)*n;
+    t = linspace(0, numSec, n);
+	y = amp*sin(2*pi*75*t);
+end
+
+function y = harmonicb(y, fs, n)
+%Add 10 harmonics to the fundamental, with amplitudes of 1/k where k = harmonic number. 
+    numSec = (1/fs)*n;
+    t = linspace(0, numSec, n);
+    for i = 2:11
+        y = y + (1/i).*sin(2*pi*i*75*t);
+    end
+end
+
+function y = harmonicc(y, fs, n)
+%Add 10 harmonics to the fundamental, with amplitudes of 1/k where k = harmonic number. 
+    numSec = (1/fs)*n;
+    t = linspace(0, numSec, n);
+    for i = 12:21
+        y = y + (1/i).*sin(2*pi*i*75*t);
+    end
+end
+
+function y = harmonicd(y, fs, n)
+%Add 10 harmonics to the fundamental, with amplitudes of 1/k where k = harmonic number. 
+    numSec = (1/fs)*n;
+    t = linspace(0, numSec, n);
+    for k = 3:2:21
+        m = ((k-1)/2)^2;
+        y = y + ((-1)^m/k^2).*sin(2*pi*k*75*t);        
+    end
+end

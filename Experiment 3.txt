@@ -1,0 +1,386 @@
+%Experiment 3: Discrete Signals
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 1     %
+%%%%%%%%%%%%%%%%%%%%
+figure;
+x = [0.9777    1.0870    0.1524    1.0961    0.7588    0.1170    0.3342    0.6563    1.1490    1.1579    0.1891];
+n = -5:5 %time values(x-axis)
+stem(n, x);
+title('Number 1 (Plot x[n])');
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 2     %
+%%%%%%%%%%%%%%%%%%%%
+%Plot 2 (x[n])
+figure;
+%subplot(3, 2, 1);
+stem(n, x); %creates a stem plot of the given parameters
+title('Plot 2 (x[n])');
+
+%Plot 2a (x[-n])
+%subplot(3, 2, 2);
+x2a = fliplr(x);
+stem(n, x2a); %creates a stem plot of the given parameters
+title('Plot 2a (x[-n])');
+
+%Plot 2b (x[2n])
+%subplot(3, 2, 3);
+x2b = sigcompress(x, 2);
+x2b = sigadjust(x2b, n);
+stem(n, x2b); %creates a stem plot of the given parameters
+title('Plot 2b (x[2n])');
+
+%Plot 2c (x[n/2])
+%subplot(3, 2, 4);
+x2c = sigexpand(x, 2);
+x2c = sigadjust(x2c, n);
+stem(n, x2c); %creates a stem plot of the given parameters
+title('Plot 2c (x[n/2])');
+
+%Plot 2d (x[n-3])
+%subplot(3, 2, 5);
+x2d = sigshift(x, -3);
+stem(n, x2d); %creates a stem plot of the given parameters
+title('Plot 2d (x[n-3])');
+
+%Plot 2e (x[n+2])
+%subplot(3, 2, 6);
+x2e = sigshift(x, 2);
+stem(n, x2e); %creates a stem plot of the given parameters
+title('Plot 2e (x[n+2])');
+
+%sgtitle('Number 2');
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 3     %
+%%%%%%%%%%%%%%%%%%%%
+%Plot 3a (x[-n - 2])
+figure;
+subplot(3, 1, 1);
+stem(n, x);
+title('Plot x[n]');
+
+subplot(3, 1, 2);
+x3a = fliplr(x);
+stem(n, x3a);
+title('Plot x[-n]');
+
+subplot(3, 1, 3);
+x3a = sigshift(x3a, -2);
+stem(n, x3a);
+title('Plot x[-n-2]');
+
+sgtitle('Plot 3a');
+
+%Plot 3b (x[-2n + 3])
+figure;
+subplot(3, 1, 1);
+stem(n, x);
+title('Plot x[n]');
+
+subplot(3, 1, 2);
+x3b = fliplr(x);
+x3b = sigcompress(x3b, 2);
+x3b = sigadjust(x3b, n);
+stem(n, x3b);
+title('Plot x[-2n]');
+
+subplot(3, 1, 3);
+x3b = sigshift(x3b, 3);
+stem(n, x3b);
+title('Plot x[-2n + 3]');
+
+sgtitle('Plot 3b');
+
+%Plot 3c (x[-n/3 + 1])
+figure;
+subplot(3, 1, 1);
+stem(n, x);
+title('Plot x[n]');
+
+subplot(3, 1, 2);
+x3c = fliplr(x);
+x3c = sigexpand(x3c, 3);
+x3c = sigadjust(x3c, n);
+stem(n, x3c);
+title('Plot x[-n/3]');
+
+subplot(3, 1, 3);
+x3c = sigshift(x3c, 1);
+stem(n, x3c);
+title('Plot x[-n/3 + 1]');
+
+sgtitle('Plot 3c');
+
+%Plot 3d (-2x[n – 3])
+figure;
+subplot(3, 1, 1);
+stem(n, x);
+title('Plot x[n]');
+
+subplot(3, 1, 2);
+x3d = sigshift(x, -3);
+stem(x3d, x);
+title('Plot x[n-3]');
+
+subplot(3, 1, 3);
+x3d = -2.*x3d;
+stem(n, x3d);
+title('Plot -2x[n-3]');
+
+sgtitle('Plot 3d');
+
+%Plot 3e (3x[n + 4])
+figure;
+subplot(3, 1, 1);
+stem(n, x);
+title('Plot x[n]');
+
+subplot(3, 1, 2);
+x3e = sigshift(x, 4);
+stem(n, x3e);
+title('Plot x[n+4]');
+
+subplot(3, 1, 3);
+x3e = 3.*x3e;
+stem(n, x3e);
+title('Plot 3x[n+4]');
+
+sgtitle('Plot 3e');
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 4     %
+%%%%%%%%%%%%%%%%%%%%
+x_negN = fliplr(x) %(basically x[-n])
+figure;
+subplot(2, 2, 1); %x[n]
+stem(n, x);
+title('Plot x[n]');
+subplot(2, 2, 2); %x[-n]
+stem(n, x_negN);
+title('Plot x[-n]');
+
+%odd components of the signal (x[n]-x[-n])/2
+x_odd = (x - x_negN)./2
+subplot(2, 2, 3);
+stem(n, x_odd);
+title('Odd Components of the Signal');
+
+%even components of the signal (x[n]+x[-n])/2
+x_even = (x + x_negN)./2
+subplot(2, 2, 4);
+stem(n, x_even);
+title('Even Components of the Signal');
+
+sgtitle('Number 4');
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 5     %
+%%%%%%%%%%%%%%%%%%%%
+%Block Diagram evaluation
+%      0--> [z^-1] --> (0.5) --|     4             3
+% x[n] -|                    2(+)-->(+)------------|----->y[n]
+%      1-------------> (0.5) --|     ^             V
+%                                    |--(0.25)--[z^-1]
+figure;
+path0 = 0.5.*sigshift(x, -1)
+stem(n, path0);
+title('path0');
+
+path1 = 0.5.*x
+stem(n, path1);
+title('path1');
+
+path2 = path0 + path1
+stem(n, path2);
+title('path2');
+
+path3 = 0.25.*sigshift(path2, -1)
+stem(n, path3);
+title('path3');
+
+path4 = path2 + path3
+stem(n, path4);
+title('path4');
+
+y_n = path4
+stem(n, y_n);
+title('Plot 5')
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 6     %
+%%%%%%%%%%%%%%%%%%%%
+%1. Plot both sequences, x(k) and h(k), as functions of k.
+
+k = [-6:6];
+
+for ix = 1 : length(k)
+   xk(ix) = fxk(k(ix));
+end
+figure;
+stem(k, xk);
+title('Plot x[k]');
+for ix = 1 : length(k)
+   hk(ix) = fhk(k(ix));
+end
+figure;
+stem(k, hk);
+title('Plot h[k]');
+
+%2. Choose one of the sequences, say h(k), and timereverse it to form the sequence h(-k).
+figure;
+stem(-k, hk);
+title('Plot h[-k]');
+
+%3. Shift the time-reversed sequence by n.
+n = 1;
+k_shift = n-k;
+for ix = 1 : length(k_shift)
+   hk(ix) = fhk(k_shift(ix));
+end
+figure;
+stem(k, hk);
+title('Plot h[n-k]');
+
+%4. Multiply the two sequences x(k) and h(n - k) and 
+% sum the product for all values of k. The resulting 
+% value will be equal to y(n). This process is repeated 
+% for all possible shifts, n.
+figure;
+stem (k, hk);
+hold on;
+stem(k, xk);
+title('Plot x[k] * h[n-k]');
+
+yn = sum(xk .* hk)
+figure;
+stem(n, yn);
+title('y[n]');
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 7     %
+%%%%%%%%%%%%%%%%%%%%
+
+%a. Solve for the root of the functions: f(x) = a3 x3 – a2 x2 + a1 x – a0 = 0
+%0 <= an <= 25
+num7a = [0 25 1 24];
+root7a = roots(num7a)
+
+%b. Find the polynomial expression given the following factors: 
+%f(x) = (x – a)(x – b)(x – c)(x – d)
+num7b = [0; 25; 1; 24;];
+poly7b = poly(num7b)
+
+%c. Expand the expression below using Partial Fraction expansion.
+%h(s)=(a_4 s^4+a_3 s^3+a_2 s^2+a_1 s+a_0  )/((s-a)(s+b)(s-c)) 
+num7c_b = [0 25 1 24 2];
+num7c_a = [poly([0; 25; 1;])];
+[r, p, k] = residue(num7c_b, num7c_a)
+
+
+%functions
+%%%%%%%%%%%%%%%%%%%%
+% Public Functions %
+%%%%%%%%%%%%%%%%%%%%
+
+
+
+function y = sigshift(x, m) %x=data | m=factor
+    y = [];
+    shift = length(x) + m; %shift left/right?
+    if shift > length(x) %shift right
+        for i = 1:length(x)
+            if i-m <= 0
+                y = [y 0]; %append by the number of shifts
+            else
+                y = [y x(i-m)]; %append the data
+            end
+        end
+    elseif shift < length(x) %shift left
+        for i = 1:length(x)
+            if i-m <= length(x)
+                y = [y x(i-m)]; %add the element that is within the axis after shifting
+            else
+                y = [y 0]; %add zeros to fill the remaining space
+            end
+        end
+    end
+end
+
+% Only works assuming the middle value is the x=0
+function y = sigexpand(x, m) %x=data | m=factor
+    y = []; %create a new array for the "new" signal
+    k = m - 1; %this is for the expansion (the number of 0's added)
+    for i = 1:length(x)
+        y = [y x(i)]; %appends the data from the fundamental signal
+        if i~=length(x)
+            for k = 1:k
+                y = [y 0]; %appends k 0's to "expand" the signal
+            end
+        end
+    end
+end
+
+function y = sigcompress(x, m) %x=data | m=factor
+    y = []; %create a new array for the "new" signal
+    a = [-(length(x)-1)./2:(length(x)-1)./2]; %create the "x-axis" array with 0 as origin
+    for i = 1:length(x)
+        for j = a(i)
+            if mod(j, m)==0
+                y = [y x(i)]; %if its divisible, append that data
+            end
+        end
+    end
+end
+
+function y = sigadjust(x, n) %x=data | n=xaxis
+    if length(n) ~= length(x)
+        if length(n) > length(x) %if lengthn > lengthx append 0 to the blank data spots
+            y = [x];
+            z = (length(n)-length(x))./2;
+            for z = 1:z
+                y = [0 y 0];
+            end
+        elseif length(n) < length(x) %if lengthn < lengthx reduce the size of x to fit n
+            z = (length(x)-length(n))./2;
+            y = [x(1+z:length(x)-z)];
+        end
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%
+%     Number 6     %
+%%%%%%%%%%%%%%%%%%%%
+
+function xk = fxk(k)
+    switch k
+        case k * (0<=k & k<=5)
+            xk = 12;
+        otherwise
+            xk = 0;
+    end
+end
+
+function hk = fhk(k)
+    switch k
+        case k * (-2<=k & k<=2)
+            hk = k-2;
+        otherwise
+            hk = 0;
+    end
+end

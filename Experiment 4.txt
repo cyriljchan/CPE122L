@@ -1,0 +1,161 @@
+%Experiment 4: Digital filters: Finite Impulse Response Filters
+
+
+% % 1. Using the microphone in your device record a 5 second audio signal of your voice saying “Digital signal Processing Seat number (state your assigned)” with a sampling frequency of 11025Hz. Note use your surname the variable to store the recorded voice signal. 
+% Fs = 11025 ; % Sampling Frequency
+% nBits = 16 ; % Bits per Sample | 8 is default
+% nChannels = 1 ; % No. of Input Channels | 1=Mono 2=Stereo
+% ID = -1; % Device Identity | -1 is default
+% Chan = audiorecorder(Fs,nBits,nChannels,ID); % Recording Object
+% 
+% disp('Start speaking.');
+% recordblocking(Chan,5); % Seconds of Recording
+% disp('End of Recording.');
+% 
+% % play(Chan);
+
+
+
+% 2. Plot the Audiofile
+figure;
+ChanData = getaudiodata(Chan);% Creates an array from the audiofile
+ChanData = ChanData(:, 1);
+plot(ChanData);
+title('Chan DSP Seat No. 12');
+
+% Play the Audio signal 
+
+% sound(ChanData, Fs); % Converts the data into sound
+
+
+
+% 3. Use the Fast Fourier Transform and plot the frequency content of the signal.
+T = 1/Fs;             % Sampling period       
+L = length(ChanData);% Length of signal
+t = (0:L-1)*T;        % Time
+ChanDatafft = fft(ChanData);       %Fast Fourier Transform
+plot(t,ChanDatafft);
+title("Chan FFT");
+% stem(t,ChanDatafft);
+
+
+% ChanDatafft = fft(ChanData); %fft(x) is the Fast Fourier Transform command
+% figure;
+% plot(ChanDatafft);
+% title('Chan FFT');
+
+
+% 4. Create a moving average filter using the system h = [1, 1, 1, 1, 1]/5
+h = [1, 1, 1, 1, 1]./5; %this is the system
+den = [1]; %not exactly sure what this is
+
+% 4a
+ChanDatamovmean = filter(h, den, ChanData); %not sure what kind of command filter is
+figure;
+plot(ChanDatamovmean);
+title('Chan Moving Mean Average');
+%sound(ChanDatamovmean, Fs);
+% 4b
+ChanDatamovmean2 = filter(h, den, ChanDatamovmean);
+figure;
+plot(ChanDatamovmean2);
+title('Chan Moving Mean Average 2');
+%sound(ChanDatamovmean2, Fs);
+
+
+% 5. Create a low pass Finite Impulse Response filter with 6th order filter, cutoff frequency of 2000Hz and a sampling frequency of 11025Hz.
+N = 6; %Nth Order
+Fc = 2000; %Cutoff Frequency of 2000Hz
+Fs = 11025; %Sampling Frequency of 11025Hz
+Wc = Fc ./ (Fs ./ 2) %have no idea what this is
+% 5a
+lpfilt = fir1(N, Wc, 'low') %FIR Low Pass
+% 5b
+zplane(lpfilt); %poles and zeroes
+% 5c
+impz(lpfilt); %impulse respons
+% 5d
+freqz(lpfilt); %frequency response
+
+% 6. Filter the original audio signal using the created low pass FIR filter (no.5).
+den = [1];
+ChanDatalp = filter(lpfilt, den, ChanData);
+plot(ChanDatalp);
+title('Chan Low Pass FIR Filter 6th Order');
+% sound(ChanDatalp, Fs);
+
+
+% 7. Create a low pass Finite Impulse Response filter with 6th order filter, cutoff frequency of 1000Hz and a sampling frequency of 11025Hz.  
+N = 6; %Nth Order
+Fc = 1000; %Cutoff Frequency of 1000Hz
+Fs = 11025; %Sampling Frequency of 11025Hz
+Wc = Fc ./ (Fs ./ 2) %have no idea what this is
+% 7a
+lpfilt = fir1(N, Wc, 'low') %FIR Low Pass
+% 7b
+zplane(lpfilt); %poles and zeroes
+% 7c
+impz(lpfilt); %impulse response
+% 7d
+freqz(lpfilt); %frequency response
+
+
+% 8. Filter the original audio signal using the created low pass FIR filter (no. 7).
+den = [1];
+ChanDatalp = filter(lpfilt, den, ChanData);
+plot(ChanDatalp);
+title('Chan Low Pass FIR Filter 6th Order 2');
+% sound(ChanDatalp, Fs);
+
+
+% 9. Create a band pass Finite Impulse Response filter with 30th order filter, cutoff frequency of 2500Hz and 3000Hz.  
+N = 30; %Nth Order
+Fc1 = 2500; %Cutoff Frequency of 2500Hz
+Fc2 = 3000; %Cutoff Frequency of 3000Hz
+Wc1 = Fc1 ./ (Fs ./ 2); %have no idea what this is
+Wc2 = Fc2 ./ (Fs ./ 2); %have no idea what this is
+bpfilt = fir1(N, [Wc1 Wc2], 'bandpass') %FIR Low Pass
+% 9a
+zplane(bpfilt); %poles and zeroes
+
+% 9b
+[h, w] = freqz(bpfilt); %frequency response
+plot(w/pi, 20*log10(abs(h))); %plotting only the magnitude response
+xlabel('Normalized Frequency Response (\times\pi rad/sample)');
+ylabel('Magnitude (dB)');
+
+
+
+
+% 10. Filter the original audio signal using the created low pass FIR filter (no. 9).
+den = [1];
+ChanDatabp = filter(bpfilt, den, ChanData);
+plot(ChanDatabp);
+title('Chan Band Pass FIR Filter 30th Order');
+
+% sound(ChanDatabp, Fs);
+
+
+
+% 11. Create a stop band pass Finite Impulse Response filter with 30th order filter, cutoff frequency of 1500Hz and 3000Hz.  
+N = 30; %Nth Order
+Fc1 = 1500; %Cutoff Frequency of 1500Hz
+Fc2 = 3000; %Cutoff Frequency of 3000Hz
+Wc1 = Fc1 ./ (Fs ./ 2); %have no idea what this is
+Wc2 = Fc2 ./ (Fs ./ 2); %have no idea what this is
+sbpfilt = fir1(N, [Wc1 Wc2], 'stop') %FIR Low Pass
+% 11a
+zplane(sbpfilt); %poles and zeroes
+% 11b
+impz(sbpfilt); %impulse respons
+% 11c
+freqz(sbpfilt); %frequency response
+
+
+% 12. Filter the original audio signal using the created low pass FIR filter (no. 11).
+den = [1];
+ChanDatasbp = filter(sbpfilt, den, ChanData);
+plot(ChanDatasbp);
+title('Chan Stop Band Pass FIR Filter 30th Order');
+
+% sound(ChanDatasbp, Fs);
