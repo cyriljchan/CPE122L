@@ -1,0 +1,256 @@
+classdef Experiment5DisctreteTimeSignalCompression < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure             matlab.ui.Figure
+        DiscreteTimeSignalCompressionLabel  matlab.ui.control.Label
+        COMPRESSButton       matlab.ui.control.Button
+        AddDiscreteSignalValueEditFieldLabel  matlab.ui.control.Label
+        AddDiscreteSignalValueEditField  matlab.ui.control.NumericEditField
+        EntertheCompressionFactorEditFieldLabel  matlab.ui.control.Label
+        EntertheCompressionFactorEditField  matlab.ui.control.NumericEditField
+        UITable              matlab.ui.control.Table
+        ADDButton            matlab.ui.control.Button
+        ReadExcelDataButton  matlab.ui.control.Button
+        UITable_2            matlab.ui.control.Table
+        REMOVEButton         matlab.ui.control.Button
+        RemoventhDiscreteValueEditFieldLabel  matlab.ui.control.Label
+        RemoventhDiscreteValueEditField  matlab.ui.control.NumericEditField
+        ClearDataButton      matlab.ui.control.Button
+        UIAxes               matlab.ui.control.UIAxes
+        UIAxes_2             matlab.ui.control.UIAxes
+    end
+
+    
+    properties (Access = public)
+        t % input table data
+        t2 % output table data
+    end
+    
+    methods (Access = private)
+        
+        function y = sigcompress(app, x, m) %x=data | m=factor
+            y = []; %create a new array for the "new" signal
+            a = [1:width(x)]; %create the "x-axis" array with 0 as origin
+            for i = 1:width(x)
+                for j = a(i)
+                    if mod(j, m)==0
+                        y = [y x(1, i)]; %if its divisible, append that data
+                    end
+                end
+            end
+        end
+    end
+    
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: COMPRESSButton
+        function COMPRESSButtonPushed(app, event)
+            x = [app.UITable.Data];
+            m = app.EntertheCompressionFactorEditField.Value;
+            y = sigcompress(app, x, m);
+            
+            app.UITable_2.Data = y;
+            
+            stem(app.UIAxes_2, y{:,:});
+            
+        end
+
+        % Button pushed function: ADDButton
+        function ADDButtonPushed(app, event)
+            x = app.AddDiscreteSignalValueEditField.Value;
+            if (isempty(app.t) == 1)
+                app.t = table;
+            else
+                app.t = app.t;
+            end
+            nd = {x};
+            app.UITable.Data = [app.t nd];
+            app.t = app.UITable.Data;
+            
+            stem(app.UIAxes, app.t{:, :});
+        end
+
+        % Button pushed function: ReadExcelDataButton
+        function ReadExcelDataButtonPushed(app, event)
+            app.t = readtable("discrete signal data.xlsx", "Sheet", 1);
+            app.UITable.Data = app.t;
+            
+            stem(app.UIAxes, app.t{:, :});
+        end
+
+        % Button pushed function: REMOVEButton
+        function REMOVEButtonPushed(app, event)
+            rd = app.RemoventhDiscreteValueEditField.Value;
+            app.t (:, rd) = [];
+            app.UITable.Data = app.t;
+            stem(app.UIAxes, app.t{:, :});
+        end
+
+        % Button pushed function: ClearDataButton
+        function ClearDataButtonPushed(app, event)
+            app.t(:, :) = [];
+            app.UITable.Data = app.t;
+            stem(app.UIAxes, app.t{:, :});
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 856 594];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create DiscreteTimeSignalCompressionLabel
+            app.DiscreteTimeSignalCompressionLabel = uilabel(app.UIFigure);
+            app.DiscreteTimeSignalCompressionLabel.FontWeight = 'bold';
+            app.DiscreteTimeSignalCompressionLabel.Position = [330 563 198 32];
+            app.DiscreteTimeSignalCompressionLabel.Text = 'Discrete Time Signal Compression';
+
+            % Create COMPRESSButton
+            app.COMPRESSButton = uibutton(app.UIFigure, 'push');
+            app.COMPRESSButton.ButtonPushedFcn = createCallbackFcn(app, @COMPRESSButtonPushed, true);
+            app.COMPRESSButton.BackgroundColor = [0.6353 0.0784 0.1843];
+            app.COMPRESSButton.FontName = 'Comic Sans MS';
+            app.COMPRESSButton.FontSize = 10;
+            app.COMPRESSButton.FontWeight = 'bold';
+            app.COMPRESSButton.FontColor = [1 1 1];
+            app.COMPRESSButton.Position = [289 31 74 26];
+            app.COMPRESSButton.Text = 'COMPRESS';
+
+            % Create AddDiscreteSignalValueEditFieldLabel
+            app.AddDiscreteSignalValueEditFieldLabel = uilabel(app.UIFigure);
+            app.AddDiscreteSignalValueEditFieldLabel.Position = [35 103 139 22];
+            app.AddDiscreteSignalValueEditFieldLabel.Text = 'Add Discrete Signal Value';
+
+            % Create AddDiscreteSignalValueEditField
+            app.AddDiscreteSignalValueEditField = uieditfield(app.UIFigure, 'numeric');
+            app.AddDiscreteSignalValueEditField.Position = [213 106 57 16];
+
+            % Create EntertheCompressionFactorEditFieldLabel
+            app.EntertheCompressionFactorEditFieldLabel = uilabel(app.UIFigure);
+            app.EntertheCompressionFactorEditFieldLabel.Position = [35 33 163 22];
+            app.EntertheCompressionFactorEditFieldLabel.Text = 'Enter the Compression Factor';
+
+            % Create EntertheCompressionFactorEditField
+            app.EntertheCompressionFactorEditField = uieditfield(app.UIFigure, 'numeric');
+            app.EntertheCompressionFactorEditField.Position = [213 36 57 16];
+
+            % Create UITable
+            app.UITable = uitable(app.UIFigure);
+            app.UITable.ColumnName = '';
+            app.UITable.RowName = {};
+            app.UITable.Position = [35 197 329 51];
+
+            % Create ADDButton
+            app.ADDButton = uibutton(app.UIFigure, 'push');
+            app.ADDButton.ButtonPushedFcn = createCallbackFcn(app, @ADDButtonPushed, true);
+            app.ADDButton.BackgroundColor = [0.6353 0.0784 0.1843];
+            app.ADDButton.FontName = 'Comic Sans MS';
+            app.ADDButton.FontSize = 10;
+            app.ADDButton.FontWeight = 'bold';
+            app.ADDButton.FontColor = [1 1 1];
+            app.ADDButton.Position = [289 98 74 26];
+            app.ADDButton.Text = 'ADD';
+
+            % Create ReadExcelDataButton
+            app.ReadExcelDataButton = uibutton(app.UIFigure, 'push');
+            app.ReadExcelDataButton.ButtonPushedFcn = createCallbackFcn(app, @ReadExcelDataButtonPushed, true);
+            app.ReadExcelDataButton.BackgroundColor = [0.6353 0.0784 0.1843];
+            app.ReadExcelDataButton.FontName = 'Comic Sans MS';
+            app.ReadExcelDataButton.FontSize = 10;
+            app.ReadExcelDataButton.FontWeight = 'bold';
+            app.ReadExcelDataButton.FontColor = [1 1 1];
+            app.ReadExcelDataButton.Position = [75 162 99 26];
+            app.ReadExcelDataButton.Text = 'Read Excel Data';
+
+            % Create UITable_2
+            app.UITable_2 = uitable(app.UIFigure);
+            app.UITable_2.ColumnName = '';
+            app.UITable_2.RowName = {};
+            app.UITable_2.Position = [493 197 329 51];
+
+            % Create REMOVEButton
+            app.REMOVEButton = uibutton(app.UIFigure, 'push');
+            app.REMOVEButton.ButtonPushedFcn = createCallbackFcn(app, @REMOVEButtonPushed, true);
+            app.REMOVEButton.BackgroundColor = [0.6353 0.0784 0.1843];
+            app.REMOVEButton.FontName = 'Comic Sans MS';
+            app.REMOVEButton.FontSize = 10;
+            app.REMOVEButton.FontWeight = 'bold';
+            app.REMOVEButton.FontColor = [1 1 1];
+            app.REMOVEButton.Position = [289 65 74 26];
+            app.REMOVEButton.Text = 'REMOVE';
+
+            % Create RemoventhDiscreteValueEditFieldLabel
+            app.RemoventhDiscreteValueEditFieldLabel = uilabel(app.UIFigure);
+            app.RemoventhDiscreteValueEditFieldLabel.Position = [35 67 162 22];
+            app.RemoventhDiscreteValueEditFieldLabel.Text = 'Remove nth Discrete Value';
+
+            % Create RemoventhDiscreteValueEditField
+            app.RemoventhDiscreteValueEditField = uieditfield(app.UIFigure, 'numeric');
+            app.RemoventhDiscreteValueEditField.Position = [212 70 58 16];
+
+            % Create ClearDataButton
+            app.ClearDataButton = uibutton(app.UIFigure, 'push');
+            app.ClearDataButton.ButtonPushedFcn = createCallbackFcn(app, @ClearDataButtonPushed, true);
+            app.ClearDataButton.BackgroundColor = [0.6353 0.0784 0.1843];
+            app.ClearDataButton.FontName = 'Comic Sans MS';
+            app.ClearDataButton.FontSize = 10;
+            app.ClearDataButton.FontWeight = 'bold';
+            app.ClearDataButton.FontColor = [1 1 1];
+            app.ClearDataButton.Position = [225 162 99 26];
+            app.ClearDataButton.Text = 'Clear Data';
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.UIFigure);
+            title(app.UIAxes, 'Original Signal')
+            xlabel(app.UIAxes, 'X')
+            ylabel(app.UIAxes, 'Y')
+            zlabel(app.UIAxes, 'Z')
+            app.UIAxes.Position = [1 247 398 321];
+
+            % Create UIAxes_2
+            app.UIAxes_2 = uiaxes(app.UIFigure);
+            title(app.UIAxes_2, 'Output Signal')
+            xlabel(app.UIAxes_2, 'X')
+            ylabel(app.UIAxes_2, 'Y')
+            zlabel(app.UIAxes_2, 'Z')
+            app.UIAxes_2.Position = [459 247 398 321];
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = Experiment5DisctreteTimeSignalCompression
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
